@@ -48,19 +48,20 @@ set -x
 # See https://www.everythingcli.org/ssh-tunnelling-for-fun-and-profit-autossh/
 
 ECHO=/bin/echo
-CUT=/bin/cut
+SED=/bin/sed
 AUTOSSH=/opt/bin/autossh
 SCREEN=/usr/sbin/screen
 DESTINATION=yoursshuser@your.host.com
+LOCAL_PORTS="21 22 8080"
 
 # Forward ports to loota. Remote port will be 555 + <last two digits of forwarded port>
 cd /
 # autossh will retry even on failure of first attempt to run ssh.
 export AUTOSSH_GATETIME=0
-for localport in 21 22 8081; do
-    port_first_two_digits=$($ECHO $localport|$CUT -c3-)
-    remote_port=555${port_first_two_digits}
-        TERMINFO=/opt/share/terminfo $SCREEN -dmS sshtunnelloota_${localport} \
+for localport in $LOCAL_PORTS; do
+    port_last_two_digits=$($ECHO $localport|$SED 's/.*\(..\)/\1/')
+    remote_port=555${port_last_two_digits}
+    TERMINFO=/opt/share/terminfo $SCREEN -dmS sshtunnelloota_${localport} \
                 sh -c "echo \"SSH port forward -R ${remote_port}:localhost:${localport}.\" \
                 	&& $AUTOSSH -N -M 0 -o 'ServerAliveInterval 30' -o 'ServerAliveCountMax 3' \
                         $DESTINATION -T -R ${remote_port}:localhost:${localport}"
