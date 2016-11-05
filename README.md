@@ -54,7 +54,7 @@ SCREEN=/usr/sbin/screen
 DESTINATION=yoursshuser@your.host.com
 LOCAL_PORTS="21 22 8080"
 
-# Forward ports to loota. Remote port will be 555 + <last two digits of forwarded port>
+# Forward ports to remote host. Remote port will be 555 + <last two digits of forwarded port>
 cd /
 # autossh will retry even on failure of first attempt to run ssh.
 export AUTOSSH_GATETIME=0
@@ -63,7 +63,7 @@ for localport in $LOCAL_PORTS; do
     remote_port=555${port_last_two_digits}
     TERMINFO=/opt/share/terminfo $SCREEN -dmS sshtunnelloota_${localport} \
                 sh -c "echo \"SSH port forward -R ${remote_port}:localhost:${localport}.\" \
-                	&& $AUTOSSH -N -M 0 -o 'ServerAliveInterval 30' -o 'ServerAliveCountMax 3' \
+                	&& $AUTOSSH -N -M 0 -o 'ServerAliveInterval 30' -o 'ServerAliveCountMax 3' -o 'ExitOnForwardFailure yes' \
                         $DESTINATION -T -R ${remote_port}:localhost:${localport}"
 done
 ````
