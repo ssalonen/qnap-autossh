@@ -64,7 +64,7 @@ for localport in $LOCAL_PORTS; do
     TERMINFO=/opt/share/terminfo $SCREEN -dmS sshtunnelloota_${localport} \
                 sh -c "echo \"SSH port forward -R ${remote_port}:localhost:${localport}.\" \
                 	&& $AUTOSSH -N -M 0 -o 'ServerAliveInterval 30' -o 'ServerAliveCountMax 3' -o 'ExitOnForwardFailure yes' \
-                        $DESTINATION -T -R ${remote_port}:localhost:${localport}"
+                        $DESTINATION -T -R *:${remote_port}:localhost:${localport}"
 done
 ````
 7. `chmod +x /share/MD0_DATA/.qpkg/autorun/open_ssh_tunnels.sh`
@@ -74,3 +74,5 @@ done
 ````
 umount /tmp/config
 ````
+
+9. Make sure you have `GatewayPorts` enabled on ssh server if you want to listen to all network interfaces
